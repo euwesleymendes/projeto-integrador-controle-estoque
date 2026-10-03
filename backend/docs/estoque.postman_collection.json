@@ -1,0 +1,682 @@
+{
+  "info": {
+    "name": "Controle de Estoque",
+    "description": "Chamadas da API do Projeto Integrador. Rode na ordem: fornecedores, produtos, associação e limpeza. No Postman o CNPJ e os códigos de barras são sorteados a cada execução, então dá para rodar de novo sem dar conflito.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000"
+    },
+    {
+      "key": "fornecedorId",
+      "value": "1"
+    },
+    {
+      "key": "produtoId",
+      "value": "1"
+    },
+    {
+      "key": "cnpj",
+      "value": "12345678000195"
+    },
+    {
+      "key": "codigoBarras",
+      "value": "7891234567895"
+    },
+    {
+      "key": "codigoBarras2",
+      "value": "7890000111222"
+    }
+  ],
+  "item": [
+    {
+      "name": "Status da API",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 200', () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/"
+      }
+    },
+    {
+      "name": "1 Fornecedores",
+      "item": [
+        {
+          "name": "Cadastrar fornecedor (sucesso)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('cnpj', Array.from({ length: 14 }, () => Math.floor(Math.random() * 10)).join(''));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('fornecedorId', pm.response.json().fornecedor.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/fornecedores",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Distribuidora Central\",\n  \"cnpj\": \"{{cnpj}}\",\n  \"endereco\": \"Rua das Flores, 100, São Paulo\",\n  \"telefone\": \"(11) 3456-7890\",\n  \"email\": \"contato@central.com\",\n  \"contatoPrincipal\": \"Marcos Silva\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Cadastrar fornecedor com CNPJ repetido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/fornecedores",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Distribuidora Central\",\n  \"cnpj\": \"{{cnpj}}\",\n  \"endereco\": \"Rua das Flores, 100, São Paulo\",\n  \"telefone\": \"(11) 3456-7890\",\n  \"email\": \"contato@central.com\",\n  \"contatoPrincipal\": \"Marcos Silva\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Cadastrar fornecedor com dados inválidos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/fornecedores",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"\",\n  \"cnpj\": \"123\",\n  \"email\": \"abc\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Listar fornecedores",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/fornecedores"
+          }
+        },
+        {
+          "name": "Buscar fornecedor por id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/fornecedores/{{fornecedorId}}"
+          }
+        },
+        {
+          "name": "Atualizar fornecedor",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/fornecedores/{{fornecedorId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Distribuidora Central\",\n  \"cnpj\": \"{{cnpj}}\",\n  \"endereco\": \"Rua das Flores, 100, São Paulo\",\n  \"telefone\": \"(11) 3456-7890\",\n  \"email\": \"contato@central.com\",\n  \"contatoPrincipal\": \"Ana Souza\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2 Produtos",
+      "item": [
+        {
+          "name": "Cadastrar produto (sucesso)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('codigoBarras', Array.from({ length: 13 }, () => Math.floor(Math.random() * 10)).join(''));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('produtoId', pm.response.json().produto.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/produtos",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Mouse sem fio\",\n  \"codigoBarras\": \"{{codigoBarras}}\",\n  \"descricao\": \"Mouse óptico sem fio 2.4GHz\",\n  \"quantidadeEstoque\": 25,\n  \"categoria\": \"Eletrônicos\",\n  \"precoCusto\": 39.9\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Cadastrar produto com imagem (form-data)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('codigoBarras2', Array.from({ length: 13 }, () => Math.floor(Math.random() * 10)).join(''));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/produtos",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "nome",
+                  "value": "Leite integral 1L",
+                  "type": "text"
+                },
+                {
+                  "key": "codigoBarras",
+                  "value": "{{codigoBarras2}}",
+                  "type": "text"
+                },
+                {
+                  "key": "descricao",
+                  "value": "Caixa de leite integral",
+                  "type": "text"
+                },
+                {
+                  "key": "quantidadeEstoque",
+                  "value": "10",
+                  "type": "text"
+                },
+                {
+                  "key": "categoria",
+                  "value": "Alimentos",
+                  "type": "text"
+                },
+                {
+                  "key": "dataValidade",
+                  "value": "2026-12-31",
+                  "type": "text"
+                },
+                {
+                  "key": "imagem",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Cadastrar produto com código de barras repetido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/produtos",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Mouse sem fio\",\n  \"codigoBarras\": \"{{codigoBarras}}\",\n  \"descricao\": \"Mouse óptico sem fio 2.4GHz\",\n  \"quantidadeEstoque\": 25,\n  \"categoria\": \"Eletrônicos\",\n  \"precoCusto\": 39.9\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Cadastrar produto com dados inválidos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/produtos",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"\",\n  \"codigoBarras\": \"abc\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Listar produtos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/produtos"
+          }
+        },
+        {
+          "name": "Buscar produto por id (com fornecedores)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/produtos/{{produtoId}}"
+          }
+        },
+        {
+          "name": "Atualizar produto",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/produtos/{{produtoId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Mouse sem fio\",\n  \"codigoBarras\": \"{{codigoBarras}}\",\n  \"descricao\": \"Mouse óptico sem fio 2.4GHz\",\n  \"quantidadeEstoque\": 40,\n  \"categoria\": \"Eletrônicos\",\n  \"precoCusto\": 39.9\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Listar categorias",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/categorias"
+          }
+        }
+      ]
+    },
+    {
+      "name": "3 Associação produto e fornecedor",
+      "item": [
+        {
+          "name": "Associar fornecedor ao produto",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/produtos/{{produtoId}}/fornecedores",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fornecedorId\": {{fornecedorId}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Associar o mesmo fornecedor de novo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/produtos/{{produtoId}}/fornecedores",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fornecedorId\": {{fornecedorId}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Fornecedores do produto",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/produtos/{{produtoId}}/fornecedores"
+          }
+        },
+        {
+          "name": "Produtos do fornecedor",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/fornecedores/{{fornecedorId}}/produtos"
+          }
+        },
+        {
+          "name": "Desassociar fornecedor do produto",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/produtos/{{produtoId}}/fornecedores/{{fornecedorId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "4 Limpeza",
+      "item": [
+        {
+          "name": "Excluir produto",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/produtos/{{produtoId}}"
+          }
+        },
+        {
+          "name": "Excluir fornecedor",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/fornecedores/{{fornecedorId}}"
+          }
+        }
+      ]
+    }
+  ]
+}
