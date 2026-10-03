@@ -1,0 +1,10 @@
+{
+  "name": "controle-estoque-backend",
+  "version": "1.0.0",
+  "description": "Backend do sistema de controle de estoque do Projeto Integrador",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "license": "ISC"
+}
