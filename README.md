@@ -10,7 +10,7 @@ Por enquanto só o backend está pronto, feito em Node.js com Express e SQLite. 
 
 ## Como rodar o backend
 
-Precisa do Node.js instalado (versão 20 ou mais nova).
+Precisa do Node.js instalado (versão 22 ou mais nova).
 
 ```
 cd backend
